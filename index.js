@@ -3,7 +3,7 @@ const app = express()
 const cors = require('cors')
 const port = process.env.PORT || 3000
 
-app.use(cors())
+app.use(cors(["*"]))
 app.use(express.json())
 
 
@@ -16,10 +16,11 @@ const client = new MongoClient(uri, {
       strict: true,
       deprecationErrors: true,
     }
-});
-
-async function run() {
+  });
+  
+  async function run() {
     try {
+        // await client.connect();
 
       const bookCollection = client.db('Book_Store_Management').collection('books')
       const preOrderCollection = client.db('Book_Store_Management').collection('pre-order')
@@ -93,8 +94,7 @@ async function run() {
         res.send(result)
       })
 
-    //   await client.connect();
-      await client.db("admin").command({ ping: 1 });
+      // await client.db("admin").command({ ping: 1 });
       console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
     //   await client.close();
