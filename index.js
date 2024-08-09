@@ -31,18 +31,7 @@ async function run() {
 
       app.get('/pre-orders', async(req, res) => {
         const result = await preOrderCollection.find().toArray() 
-
-        const groupedOrders = result.reduce((acc, order) => {
-          const existingOrder = acc.find(item => item.customerName === order.customerName);
-          if (existingOrder) {
-            existingOrder.orderedBooks = existingOrder.orderedBooks.concat(order.orderedBooks);
-          } else {
-            acc.push(order);
-          }
-          return acc;
-        }, []);
-
-        res.send(groupedOrders)
+        res.send(result)
       })
       
       app.post('/new-book', async(req, res) => {
@@ -53,8 +42,18 @@ async function run() {
 
       app.post('/new-preorder', async(req, res) => {
         const preOrder = req.body
-        const result = await preOrderCollection.insertOne(preOrder)
-        res.send(result)
+        const isCustomerExist = await preOrderCollection.find({customerName: preOrder.customerName}).toArray()        
+        
+        if(isCustomerExist.length > 0){
+          const updateResult = await preOrderCollection.updateOne(
+            { customerName: preOrder.customerName },
+            { $push: { orderedBooks: { $each: preOrder.orderedBooks } } }
+          );
+          res.send(updateResult);
+        } else {
+          const result = await preOrderCollection.insertOne(preOrder)
+          res.send(result)
+        }
       })
 
       app.delete('/remove-book/:id', async(req, res) => {
@@ -76,6 +75,21 @@ async function run() {
           }
         }
         const result = await bookCollection.updateOne(filter, book)
+        res.send(result)
+      })
+      
+      app.patch('/preorder/:id', async(req, res) => {
+        const id = req.params.id;
+        const updatePreOrder = req.body
+        const filter = {_id: new ObjectId(id)}
+        const preOrder = {
+          $set: {
+            customerName: updatePreOrder.customerName,
+            customerNumber: updatePreOrder.customerNumber,
+            orderedBooks: updatePreOrder.orderedBooks
+          }
+        }
+        const result = await preOrderCollection.updateOne(filter, preOrder)
         res.send(result)
       })
 
