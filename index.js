@@ -10,13 +10,8 @@ app.use(express.json())
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://ashrafulislamrifaz:VQ6rWGSDgNlptVc8@cluster0.rejbvaf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 
-const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-});
+const client = new MongoClient(uri, { useUnifiedTopology: true}, { useNewUrlParser: true }, { connectTimeoutMS: 30000 }, { keepAlive: 1});
+
 
 async function run() {
     try {
