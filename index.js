@@ -72,6 +72,7 @@ const client = new MongoClient(uri, {
           $set: {
             name: updateBook.name,
             price: updateBook.price,
+            stock: updateBook.stock,
             description: updateBook.description
           }
         }
