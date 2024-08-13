@@ -64,6 +64,18 @@ const client = new MongoClient(uri, {
         res.send(result)
       })
 
+      app.delete('/pre-orders', async(req, res) => {
+        const result = await preOrderCollection.deleteMany({})
+        res.send(result)
+      })
+
+      app.delete('/pre-orders/:id', async(req, res) => {
+        const id = req.params.id
+        const filter = { _id: new ObjectId(id) }
+        const result = await preOrderCollection.deleteOne(filter)
+        res.send(result)
+      })
+
       app.patch('/edit-book/:id', async(req, res) => {
         const id = req.params.id;
         const updateBook = req.body
